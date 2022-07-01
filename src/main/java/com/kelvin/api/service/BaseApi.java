@@ -51,8 +51,6 @@ public abstract class BaseApi<T> {
     @GetMapping("/{id}")
     public ResponseEntity<T> fetch(@PathVariable String id){
 
-        id = null;
-
         if (id == null || id.isBlank()){
             throw new InvalidParameterException();
         }
