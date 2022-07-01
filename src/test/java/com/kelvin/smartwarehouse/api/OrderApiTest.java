@@ -1,6 +1,7 @@
 package com.kelvin.smartwarehouse.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kelvin.smartwarehouse.management.AppConstants;
 import com.kelvin.smartwarehouse.model.OrderStatus;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
+import static com.kelvin.smartwarehouse.management.AppConstants.ORDERS_URL;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -48,7 +50,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                get("/orders")
+                get(ORDERS_URL)
                         .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isOk())
@@ -68,7 +70,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        get("/orders")
+                        get(ORDERS_URL)
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isOk())
@@ -88,7 +90,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        post("/orders")
+                        post(ORDERS_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody))
         //then
@@ -113,7 +115,42 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @Sql({"/orders_schema.sql", "/import_orders.sql"})
-    void shouldFetchOrderById() {
+    void givenSeedDataFromImportOrdersSqlAndId_whenGetAll_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
+
+        //given
+        //the data imported from import_orders.sql
+        String id = "9fe2e517-c135-4f3e-a1c2-705e5b59a4f7";
+
+        //when
+        this.mockMvc.perform(
+                        get(ORDERS_URL+ "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.uuid", is("9fe2e517-c135-4f3e-a1c2-705e5b59a4f7")))
+                .andExpect(jsonPath("$.submittedDate", is("2022-06-15")))
+                .andExpect(jsonPath("$.deadlineDate", is("2022-06-30")))
+                .andExpect(jsonPath("$.status", is("FULFILLED")));
+    }
+
+    @Test
+    @Order(2)
+    void givenEmptyOrdersListAndId_whenGetAll_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
+
+        //given
+        //the data imported from import_orders.sql
+        String id = "";
+
+        //when
+        this.mockMvc.perform(
+                        get(ORDERS_URL + "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.uuid", is("9fe2e517-c135-4f3e-a1c2-705e5b59a4f7")))
+                .andExpect(jsonPath("$.submittedDate", is("2022-06-15")))
+                .andExpect(jsonPath("$.deadlineDate", is("2022-06-30")))
+                .andExpect(jsonPath("$.status", is("FULFILLED")));
     }
 
     @Test
