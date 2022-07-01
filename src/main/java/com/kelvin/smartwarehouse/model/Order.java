@@ -20,5 +20,6 @@ public class Order {
     private LocalDate submittedDate;
     private LocalDate deadlineDate;
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 }
