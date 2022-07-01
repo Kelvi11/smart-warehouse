@@ -1,5 +1,8 @@
-package com.kelvin.api;
+package com.kelvin.api.service;
 
+import com.kelvin.smartwarehouse.exception.EntityWithIdNotFoundException;
+import com.kelvin.smartwarehouse.exception.InvalidParameterException;
+import com.kelvin.api.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +50,24 @@ public abstract class BaseApi<T> {
 
     @GetMapping("/{id}")
     public ResponseEntity<T> fetch(@PathVariable String id){
-        return ResponseEntity.ok().build();
+
+        id = null;
+
+        if (id == null || id.isBlank()){
+            throw new InvalidParameterException();
+        }
+
+        T t = entityManager.find(getEntityClass(), id);
+
+        if (t == null){
+
+            String classSimpleName = getEntityClass().getSimpleName();
+            String entityNameAsWords = StringUtil.fromCamelCaseToSeparatedWordsWhenFirstWordStartsWithCapitalLetter(classSimpleName);
+
+            throw new EntityWithIdNotFoundException(String.format("%s with id doesn't exist in database!", entityNameAsWords));
+        }
+
+        return ResponseEntity.ok(t);
     }
 
     @PutMapping("/{id}")
