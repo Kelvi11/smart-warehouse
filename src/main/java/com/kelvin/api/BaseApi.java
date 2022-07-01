@@ -1,11 +1,18 @@
 package com.kelvin.api;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityManager;
 
 public abstract class BaseApi<T> {
 
     protected final Class<T> entityClass;
+
+    @Autowired
+    EntityManager entityManager;
 
     protected BaseApi(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -17,7 +24,9 @@ public abstract class BaseApi<T> {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<T> persist(@RequestBody T object){
+        entityManager.persist(object);
         return ResponseEntity.ok(object);
     }
 

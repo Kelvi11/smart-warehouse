@@ -24,8 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OrderApiTest {
 
     private final ObjectMapper objectMapper;
-
-        private final MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
     @Autowired
     public OrderApiTest(ObjectMapper mapper, MockMvc mockMvc) {
