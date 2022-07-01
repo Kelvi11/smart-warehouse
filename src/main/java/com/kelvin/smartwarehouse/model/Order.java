@@ -17,7 +17,10 @@ public class Order {
     @Id
     private String uuid;
 
+    @Column(name = "submitted_date")
     private LocalDate submittedDate;
+
+    @Column(name = "deadline_date")
     private LocalDate deadlineDate;
 
     @Enumerated(EnumType.STRING)

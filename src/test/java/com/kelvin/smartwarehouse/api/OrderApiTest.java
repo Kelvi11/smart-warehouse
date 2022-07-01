@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -15,9 +16,9 @@ import java.time.LocalDate;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,21 +41,57 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void shouldReturnOrderList() {
+    @Sql({"/orders_schema.sql", "/import_orders.sql"})
+    void givenSeedDataFromImportOrdersSql_whenGetAll_thenOkAndShouldReturnOrdersArray() throws Exception {
+        //given
+        //we have the data.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                get("/orders")
+                        .contentType(MediaType.APPLICATION_JSON))
+        //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.[0].uuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-07-01")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-07-10")))
+                .andExpect(jsonPath("$.[0].status", is("CREATED")));
+
     }
 
     @Test
     @Order(2)
-    void shouldPersistOrder() throws Exception {
+    void givenEmptyTable_whenGetAll_thenOkAndShouldReturnEmptyArray() throws Exception {
+        //given
+        //we have the table empty
+
+        //when
+        this.mockMvc.perform(
+                        get("/orders")
+                                .contentType(MediaType.APPLICATION_JSON))
+        //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(0)));
+
+    }
+
+
+    @Test
+    @Order(2)
+    void givenOrder_whenPostOrder_thenShouldPersistOrder() throws Exception {
+        //given
         com.kelvin.smartwarehouse.model.Order order = buildOrder();
 
         String jsonBody = objectMapper.writeValueAsString(order);
 
+        //when
         this.mockMvc.perform(
                         post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody))
-
+        //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid", is(notNullValue())))
                 .andExpect(jsonPath("$.submittedDate", is(order.getSubmittedDate().toString())))
@@ -75,6 +112,7 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
+    @Sql({"/orders_schema.sql", "/import_orders.sql"})
     void shouldFetchOrderById() {
     }
 
