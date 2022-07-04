@@ -1,6 +1,7 @@
 package com.kelvin.smartwarehouse.api;
 
 import com.kelvin.api.service.BaseApi;
+import com.kelvin.smartwarehouse.exception.InvalidParameterException;
 import com.kelvin.smartwarehouse.model.Order;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,5 +14,12 @@ public class OrderApi extends BaseApi<Order> {
 
     public OrderApi() {
         super(Order.class);
+    }
+
+    @Override
+    protected void prePersist(Order order) throws Exception {
+        if (order.getDeadlineDate() == null){
+            throw new InvalidParameterException("Order deadline date is required!");
+        }
     }
 }

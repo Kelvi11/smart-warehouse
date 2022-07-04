@@ -9,10 +9,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @ControllerAdvice
-public class EntityWithIdNotFoundExceptionHandler {
+public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {EntityWithIdNotFoundException.class})
-    public ResponseEntity handleInvalidParameterException(EntityWithIdNotFoundException e){
+    @ExceptionHandler(value = {
+            EntityWithIdNotFoundException.class,
+            InvalidParameterException.class,
+            IdMissingException.class
+    })
+    public ResponseEntity handleInvalidParameterException(RuntimeException e){
 
         ApiException apiException = new ApiException(
                 e.getMessage(),

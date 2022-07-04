@@ -1,6 +1,7 @@
 package com.kelvin.smartwarehouse.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kelvin.smartwarehouse.exception.InvalidParameterException;
 import com.kelvin.smartwarehouse.management.AppConstants;
 import com.kelvin.smartwarehouse.model.OrderStatus;
 import org.junit.jupiter.api.Order;
@@ -18,6 +19,7 @@ import static com.kelvin.smartwarehouse.management.AppConstants.ORDERS_URL;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -114,6 +116,27 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
+    void givenOrderWithoutDeadlinedDate_whenPostOrder_thenShouldReturn4xxClientError() throws Exception {
+        //given
+        com.kelvin.smartwarehouse.model.Order order = buildOrder();
+        order.setDeadlineDate(null);
+
+        String jsonBody = objectMapper.writeValueAsString(order);
+
+        //when
+        this.mockMvc.perform(
+                        post(ORDERS_URL)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonBody))
+                //then
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof InvalidParameterException))
+                .andExpect(jsonPath("$.message", is("Order deadline date is required!")));
+
+    }
+
+    @Test
+    @Order(2)
     @Sql({"/orders_schema.sql", "/import_orders.sql"})
     void givenSeedDataFromImportOrdersSqlAndId_whenGetById_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
 
@@ -135,7 +158,7 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenEmptyOrdersListAndId_whenGetById_then4xxClientError() throws Exception {
+    void givenEmptyOrdersListAndId_whenGetById_thenShouldReturn4xxClientError() throws Exception {
 
         //given
         //the data imported from import_orders.sql
@@ -147,8 +170,7 @@ public class OrderApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.message", is("Order with id [IdNotPresentInDb] doesn't exist in database!")))
-                .andDo(print());
+                .andExpect(jsonPath("$.message", is("Order with id [IdNotPresentInDb] doesn't exist in database!")));
     }
 
     @Test

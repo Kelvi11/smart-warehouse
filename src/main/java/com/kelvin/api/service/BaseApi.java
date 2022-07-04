@@ -1,7 +1,7 @@
 package com.kelvin.api.service;
 
 import com.kelvin.smartwarehouse.exception.EntityWithIdNotFoundException;
-import com.kelvin.smartwarehouse.exception.InvalidParameterException;
+import com.kelvin.smartwarehouse.exception.IdMissingException;
 import com.kelvin.api.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,16 +43,20 @@ public abstract class BaseApi<T> {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<T> persist(@RequestBody T object){
+    public ResponseEntity<T> persist(@RequestBody T object) throws Exception {
+        prePersist(object);
         entityManager.persist(object);
         return ResponseEntity.ok(object);
+    }
+
+    protected void prePersist(T object) throws Exception{
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<T> fetch(@PathVariable String id){
 
         if (id == null || id.isBlank()){
-            throw new InvalidParameterException();
+            throw new IdMissingException();
         }
 
         T t = entityManager.find(getEntityClass(), id);
