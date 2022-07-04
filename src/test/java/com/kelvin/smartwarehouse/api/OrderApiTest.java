@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -45,7 +46,11 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    @Sql({"/orders_schema.sql", "/import_orders.sql"})
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
+    })
+
     void givenSeedDataFromImportOrdersSql_whenGetAll_thenOkAndShouldReturnOrdersArray() throws Exception {
         //given
         //we have the data.sql script file loaded
@@ -76,6 +81,7 @@ public class OrderApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()", is(0)));
 
