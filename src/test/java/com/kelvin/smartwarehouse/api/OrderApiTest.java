@@ -115,7 +115,7 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @Sql({"/orders_schema.sql", "/import_orders.sql"})
-    void givenSeedDataFromImportOrdersSqlAndId_whenGetAll_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
+    void givenSeedDataFromImportOrdersSqlAndId_whenGetById_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
 
         //given
         //the data imported from import_orders.sql
@@ -135,22 +135,20 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenEmptyOrdersListAndId_whenGetAll_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
+    void givenEmptyOrdersListAndId_whenGetById_then4xxClientError() throws Exception {
 
         //given
         //the data imported from import_orders.sql
-        String id = "";
+        String id = "IdNotPresentInDb";
 
         //when
         this.mockMvc.perform(
                         get(ORDERS_URL + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
-                //then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.uuid", is("9fe2e517-c135-4f3e-a1c2-705e5b59a4f7")))
-                .andExpect(jsonPath("$.submittedDate", is("2022-06-15")))
-                .andExpect(jsonPath("$.deadlineDate", is("2022-06-30")))
-                .andExpect(jsonPath("$.status", is("FULFILLED")));
+        //then
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message", is("Order with id [IdNotPresentInDb] doesn't exist in database!")))
+                .andDo(print());
     }
 
     @Test

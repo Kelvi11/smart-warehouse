@@ -62,7 +62,7 @@ public abstract class BaseApi<T> {
             String classSimpleName = getEntityClass().getSimpleName();
             String entityNameAsWords = StringUtil.fromCamelCaseToSeparatedWordsWhenFirstWordStartsWithCapitalLetter(classSimpleName);
 
-            throw new EntityWithIdNotFoundException(String.format("%s with id doesn't exist in database!", entityNameAsWords));
+            throw new EntityWithIdNotFoundException(String.format("%s with id [%s] doesn't exist in database!", entityNameAsWords, id));
         }
 
         return ResponseEntity.ok(t);
