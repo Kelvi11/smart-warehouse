@@ -11,11 +11,7 @@ import java.time.ZonedDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {
-            EntityWithIdNotFoundException.class,
-            InvalidParameterException.class,
-            IdMissingException.class
-    })
+    @ExceptionHandler(value = {RuntimeException.class})
     public ResponseEntity handleInvalidParameterException(RuntimeException e){
 
         ApiException apiException = new ApiException(
