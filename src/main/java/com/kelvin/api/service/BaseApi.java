@@ -59,6 +59,12 @@ public abstract class BaseApi<T> {
             throw new IdMissingException();
         }
 
+        T t = getTByIdOrThrowException(id);
+
+        return ResponseEntity.ok(t);
+    }
+
+    private T getTByIdOrThrowException(String id) {
         T t = entityManager.find(getEntityClass(), id);
 
         if (t == null){
@@ -68,17 +74,25 @@ public abstract class BaseApi<T> {
 
             throw new EntityWithIdNotFoundException(String.format("%s with id [%s] doesn't exist in database!", entityNameAsWords, id));
         }
-
-        return ResponseEntity.ok(t);
+        return t;
     }
 
     @PutMapping("/{id}")
+    @Transactional
     public ResponseEntity<T> update(@PathVariable String id, T object){
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<T> delete(@PathVariable String id){
-        return ResponseEntity.ok().build();
+
+        T t = getTByIdOrThrowException(id);
+        toDelete(t);
+        return ResponseEntity.noContent().build();
+    }
+
+    protected void toDelete(T t) {
+        entityManager.remove(t);
     }
 }

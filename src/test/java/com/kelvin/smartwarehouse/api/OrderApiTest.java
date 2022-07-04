@@ -1,6 +1,7 @@
 package com.kelvin.smartwarehouse.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kelvin.smartwarehouse.exception.EntityWithIdNotFoundException;
 import com.kelvin.smartwarehouse.exception.InvalidParameterException;
 import com.kelvin.smartwarehouse.management.AppConstants;
 import com.kelvin.smartwarehouse.model.OrderStatus;
@@ -50,7 +51,6 @@ public class OrderApiTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
     })
-
     void givenSeedDataFromImportOrdersSql_whenGetAll_thenOkAndShouldReturnOrdersArray() throws Exception {
         //given
         //we have the data.sql script file loaded
@@ -81,7 +81,6 @@ public class OrderApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()", is(0)));
 
@@ -143,6 +142,27 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
+    void givenOrderWithDeadlinedDateInThePast_whenPostOrder_thenShouldReturn4xxClientError() throws Exception {
+        //given
+        com.kelvin.smartwarehouse.model.Order order = buildOrder();
+        order.setDeadlineDate(LocalDate.now().minusDays(2));
+
+        String jsonBody = objectMapper.writeValueAsString(order);
+
+        //when
+        this.mockMvc.perform(
+                        post(ORDERS_URL)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonBody))
+                //then
+                .andExpect(status().is4xxClientError())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof InvalidParameterException))
+                .andExpect(jsonPath("$.message", is("Order deadline date should be in the future!")));
+
+    }
+
+    @Test
+    @Order(2)
     @Sql({"/orders_schema.sql", "/import_orders.sql"})
     void givenSeedDataFromImportOrdersSqlAndId_whenGetById_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
 
@@ -175,7 +195,8 @@ public class OrderApiTest {
                         get(ORDERS_URL + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
-                .andExpect(status().is4xxClientError())
+                .andExpect(status().isNoContent())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
                 .andExpect(jsonPath("$.message", is("Order with id [IdNotPresentInDb] doesn't exist in database!")));
     }
 
@@ -186,6 +207,29 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void shouldDeleteOrder() {
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
+    })
+    void givenSeedDataFromImportOrdersSqlAndId_whenGetById_thenNotFoundStatusAndShouldDeleteOrder() throws Exception {
+
+        //given
+        String id = "051191d4-4eba-48ca-9a8c-19076eb7f669";
+
+        //when
+        this.mockMvc.perform(
+                        delete(ORDERS_URL + "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON))
+        //then
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        this.mockMvc.perform(
+                        get(ORDERS_URL + "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
+                .andExpect(jsonPath("$.message", is("Order with id [051191d4-4eba-48ca-9a8c-19076eb7f669] doesn't exist in database!")));
+
     }
 }

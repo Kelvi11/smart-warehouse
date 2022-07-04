@@ -6,6 +6,8 @@ import com.kelvin.smartwarehouse.model.Order;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDERS_URL;
 
 @RestController
@@ -20,6 +22,9 @@ public class OrderApi extends BaseApi<Order> {
     protected void prePersist(Order order) throws Exception {
         if (order.getDeadlineDate() == null){
             throw new InvalidParameterException("Order deadline date is required!");
+        }
+        if (order.getDeadlineDate().isBefore(LocalDate.now())){
+            throw new InvalidParameterException("Order deadline date should be in the future!");
         }
     }
 }
