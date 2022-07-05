@@ -202,7 +202,60 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void shouldUpdateOrder() {
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
+    })
+    void givenSeedDataFromImportOrdersSqlAndId_whenUpdate_thenOkStatusAndShouldUpdateOrder() throws Exception {
+
+        //given
+        String id = "051191d4-4eba-48ca-9a8c-19076eb7f669";
+        String requestBody = "{\n" +
+                "    \"uuid\" : \"051191d4-4eba-48ca-9a8c-19076eb7f669\",\n" +
+                "    \"submittedDate\" : \"2022-05-01\",\n" +
+                "    \"deadlineDate\" : \"2022-05-15\",\n" +
+                "    \"status\" : \"FULFILLED\"\n" +
+                "}";
+
+        //when
+        this.mockMvc.perform(
+                        put(ORDERS_URL + "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.uuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
+                .andExpect(jsonPath("$.submittedDate", is("2022-05-01")))
+                .andExpect(jsonPath("$.deadlineDate", is("2022-05-15")))
+                .andExpect(jsonPath("$.status", is("FULFILLED")));
+
+    }
+
+    @Test
+    @Order(2)
+    void givenEmptyOrdersListAndIdAndOrder_whenUpdate_thenOkStatusAndShouldCreateNewOrder() throws Exception {
+
+        //given
+        String id = "051191d4-4eba-48ca-9a8c-19076eb7f669";
+        String requestBody = "{\n" +
+                "    \"uuid\" : \"051191d4-4eba-48ca-9a8c-19076eb7f669\",\n" +
+                "    \"submittedDate\" : \"2022-05-01\",\n" +
+                "    \"deadlineDate\" : \"2022-05-15\",\n" +
+                "    \"status\" : \"FULFILLED\"\n" +
+                "}";
+
+        //when
+        this.mockMvc.perform(
+                        put(ORDERS_URL + "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.uuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
+                .andExpect(jsonPath("$.submittedDate", is("2022-05-01")))
+                .andExpect(jsonPath("$.deadlineDate", is("2022-05-15")))
+                .andExpect(jsonPath("$.status", is("FULFILLED")));
+
     }
 
     @Test
@@ -211,7 +264,7 @@ public class OrderApiTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
     })
-    void givenSeedDataFromImportOrdersSqlAndId_whenGetById_thenNotFoundStatusAndShouldDeleteOrder() throws Exception {
+    void givenSeedDataFromImportOrdersSqlAndId_whenDelete_thenNotFoundStatusAndShouldDeleteOrder() throws Exception {
 
         //given
         String id = "051191d4-4eba-48ca-9a8c-19076eb7f669";
@@ -221,8 +274,7 @@ public class OrderApiTest {
                         delete(ORDERS_URL + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
-                .andExpect(status().isNoContent())
-                .andDo(print());
+                .andExpect(status().isNoContent());
 
         this.mockMvc.perform(
                         get(ORDERS_URL + "/{id}", id)
@@ -230,6 +282,29 @@ public class OrderApiTest {
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
                 .andExpect(jsonPath("$.message", is("Order with id [051191d4-4eba-48ca-9a8c-19076eb7f669] doesn't exist in database!")));
+
+    }
+
+    @Test
+    @Order(2)
+    void givenEmptyOrdersListAndId_whenDelete_thenNotFoundStatus() throws Exception {
+
+        //given
+        String id = "IdNotPresentInDb";
+
+        //when
+        this.mockMvc.perform(
+                        delete(ORDERS_URL + "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isNoContent());
+
+        this.mockMvc.perform(
+                        get(ORDERS_URL + "/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
+                .andExpect(jsonPath("$.message", is("Order with id [IdNotPresentInDb] doesn't exist in database!")));
 
     }
 }

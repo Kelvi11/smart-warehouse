@@ -79,8 +79,9 @@ public abstract class BaseApi<T> {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<T> update(@PathVariable String id, T object){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<T> update(@PathVariable String id, @RequestBody T object){
+        entityManager.merge(object);
+        return ResponseEntity.ok(object);
     }
 
     @DeleteMapping("/{id}")
