@@ -19,6 +19,11 @@ public class OrderApi extends BaseApi<Order> {
     }
 
     @Override
+    protected String getDefaultOrderBy() {
+        return "deadlineDate desc";
+    }
+
+    @Override
     protected void prePersist(Order order) throws Exception {
         if (order.getDeadlineDate() == null){
             throw new InvalidParameterException("Order deadline date is required!");

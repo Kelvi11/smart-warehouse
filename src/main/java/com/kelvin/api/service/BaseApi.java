@@ -12,10 +12,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public abstract class BaseApi<T> {
+import static com.kelvin.smartwarehouse.management.AppConstants.ORDER_BY_ASC;
+import static com.kelvin.smartwarehouse.management.AppConstants.ORDER_BY_DESC;
+
+public abstract class BaseApi<T> extends HttpBase{
 
     protected final Class<T> entityClass;
 
@@ -31,15 +38,88 @@ public abstract class BaseApi<T> {
     }
 
     @GetMapping
-    public ResponseEntity getList(){
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<T> cq = cb.createQuery(getEntityClass());
-        Root<T> rootEntry = cq.from(getEntityClass());
-        CriteriaQuery<T> all = cq.select(rootEntry);
-        TypedQuery<T> allQuery = entityManager.createQuery(all);
-        List<T> list = allQuery.getResultList();
-        return ResponseEntity.ok(list);
+    @Transactional
+    public ResponseEntity getList(
+            @RequestParam(value = "startRow", required = false, defaultValue = "0") Integer startRow,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "orderBy", required = false) String orderBy
+    ) throws Exception {
+
+        applyFilters();
+
+        long listSize = count();
+        List<T> list;
+        if (listSize == 0) {
+            list = new ArrayList<>();
+        } else {
+            int currentPage = 0;
+            if (pageSize != 0) {
+                currentPage = startRow / pageSize;
+            } else {
+                pageSize = Long.valueOf(listSize).intValue();
+            }
+            TypedQuery<T> search = getSearch(orderBy);
+            list = search.setFirstResult(startRow)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        }
+
+        return ResponseEntity.ok()
+                .header("startRow", String.valueOf(startRow))
+                .header("pageSize", String.valueOf(pageSize))
+                .header("listSize", String.valueOf(listSize))
+                .body(list);
     }
+
+    private long count(){
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> countCriteriaQuery = criteriaBuilder.createQuery(Long.class);
+        countCriteriaQuery.select(criteriaBuilder.count(countCriteriaQuery.from(getEntityClass())));
+
+        return entityManager.createQuery(countCriteriaQuery).getSingleResult();
+    }
+
+    private TypedQuery<T> getSearch(String orderBy){
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(getEntityClass());
+        Root<T> root = criteriaQuery.from(getEntityClass());
+        criteriaQuery.select(root);
+
+        List<Order> orderList = sort(orderBy, criteriaBuilder, root);
+        criteriaQuery.orderBy(orderList);
+
+        TypedQuery<T> search = entityManager.createQuery(criteriaQuery);
+        return search;
+    }
+
+    private List<Order> sort(String orderBy, CriteriaBuilder criteriaBuilder, Root<T> routeRoot) {
+        List<Order> orderList = new ArrayList<>();
+
+        List<String> orderByExpresions;
+        if (orderBy != null){
+            orderByExpresions = fromValueToList(orderBy);
+        }
+        else {
+            orderByExpresions = fromValueToList(getDefaultOrderBy());
+        }
+
+        for (String orderByExpresion : orderByExpresions){
+            if (orderByExpresion.contains(ORDER_BY_ASC)){
+                String property = orderByExpresion.replace(ORDER_BY_ASC, "").trim();
+                orderList.add(criteriaBuilder.asc(routeRoot.get(property)));
+            }
+            else if(orderByExpresion.contains(ORDER_BY_DESC)){
+                String property = orderByExpresion.replace(ORDER_BY_DESC, "").trim();
+                orderList.add(criteriaBuilder.desc(routeRoot.get(property)));
+            }
+        }
+        return orderList;
+    }
+
+    public void applyFilters() throws Exception {
+
+    }
+    protected abstract String getDefaultOrderBy();
 
     @PostMapping
     @Transactional
@@ -53,6 +133,7 @@ public abstract class BaseApi<T> {
     }
 
     @GetMapping("/{id}")
+    @Transactional
     public ResponseEntity<T> fetch(@PathVariable String id){
 
         if (id == null || id.isBlank()){

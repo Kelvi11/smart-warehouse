@@ -62,6 +62,10 @@ public class OrderApiTest {
         //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "25"))
                 .andExpect(jsonPath("$.[0].uuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
                 .andExpect(jsonPath("$.[0].submittedDate", is("2022-07-01")))
                 .andExpect(jsonPath("$.[0].deadlineDate", is("2022-07-10")))
