@@ -1,5 +1,6 @@
 package com.kelvin.smartwarehouse.model;
 
+import com.kelvin.smartwarehouse.model.enums.OrderStatus;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 

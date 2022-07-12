@@ -1,4 +1,4 @@
-package com.kelvin.smartwarehouse.model;
+package com.kelvin.smartwarehouse.model.enums;
 
 public enum OrderStatus {
     CREATED,

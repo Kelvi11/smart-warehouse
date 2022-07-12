@@ -3,8 +3,7 @@ package com.kelvin.smartwarehouse.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kelvin.smartwarehouse.exception.EntityWithIdNotFoundException;
 import com.kelvin.smartwarehouse.exception.InvalidParameterException;
-import com.kelvin.smartwarehouse.management.AppConstants;
-import com.kelvin.smartwarehouse.model.OrderStatus;
+import com.kelvin.smartwarehouse.model.enums.OrderStatus;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +47,7 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/order/orders_schema.sql", "/order/import_orders.sql"}),
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
     })
     void givenSeedDataFromImportOrdersSql_whenGetAll_thenOkAndShouldReturnOrdersArray() throws Exception {
@@ -167,11 +166,11 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    @Sql({"/orders_schema.sql", "/import_orders.sql"})
+    @Sql({"/order/orders_schema.sql", "/order/import_orders.sql"})
     void givenSeedDataFromImportOrdersSqlAndId_whenGetById_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
 
         //given
-        //the data imported from import_orders.sql
+        //the data imported from import_order_items.sql
         String id = "9fe2e517-c135-4f3e-a1c2-705e5b59a4f7";
 
         //when
@@ -191,7 +190,7 @@ public class OrderApiTest {
     void givenEmptyOrdersListAndId_whenGetById_thenShouldReturn4xxClientError() throws Exception {
 
         //given
-        //the data imported from import_orders.sql
+        //the data imported from import_order_items.sql
         String id = "IdNotPresentInDb";
 
         //when
@@ -207,7 +206,7 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/order/orders_schema.sql", "/order/import_orders.sql"}),
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
     })
     void givenSeedDataFromImportOrdersSqlAndId_whenUpdate_thenOkStatusAndShouldUpdateOrder() throws Exception {
@@ -265,7 +264,7 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/orders_schema.sql", "/import_orders.sql"}),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/order/orders_schema.sql", "/order/import_orders.sql"}),
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
     })
     void givenSeedDataFromImportOrdersSqlAndId_whenDelete_thenNotFoundStatusAndShouldDeleteOrder() throws Exception {
