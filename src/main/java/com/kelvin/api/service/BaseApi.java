@@ -37,6 +37,10 @@ public abstract class BaseApi<T> extends HttpBase{
         return entityClass;
     }
 
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
     @GetMapping
     @Transactional
     public ResponseEntity getList(

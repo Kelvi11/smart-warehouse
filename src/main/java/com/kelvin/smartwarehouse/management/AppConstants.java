@@ -8,4 +8,5 @@ public class AppConstants {
 
     public final static String ORDERS_URL = API + "/orders";
     public final static String ORDER_ITEMS_URL = API + "/order-items";
+    public final static String INVENTORY_ITEMS_URL = API + "/inventory-items";
 }
