@@ -17,20 +17,26 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDERS_URL;
+import static com.kelvin.smartwarehouse.managment.TestConstants.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = ORDERS_SCHEMA_SCRIPT)
 public class OrderApiTest {
 
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
+
+    static final String importRecordsScript = IMPORT_ORDERS_SCRIPT;
+    static final String deleteStatement = DELETE_ORDERS_STATEMENT;
+
+    static final String apiUrl = ORDERS_URL;
 
     @Autowired
     public OrderApiTest(ObjectMapper mapper, MockMvc mockMvc) {
@@ -47,16 +53,16 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/order/orders_schema.sql", "/order/import_orders.sql"}),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = importRecordsScript),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = deleteStatement)
     })
-    void givenSeedDataFromImportOrdersSql_whenGetAll_thenOkAndShouldReturnOrdersArray() throws Exception {
+    void givenSeedDataFromImportSql_whenGetAll_thenOkAndShouldReturnArray() throws Exception {
         //given
         //we have the data.sql script file loaded
 
         //when
         this.mockMvc.perform(
-                get(ORDERS_URL)
+                get(apiUrl)
                         .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isOk())
@@ -80,7 +86,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        get(ORDERS_URL)
+                        get(apiUrl)
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isOk())
@@ -92,7 +98,7 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenOrder_whenPostOrder_thenShouldPersistOrder() throws Exception {
+    void givenOrder_whenPost_thenShouldPersistOrder() throws Exception {
         //given
         com.kelvin.smartwarehouse.model.Order order = buildOrder();
 
@@ -100,7 +106,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        post(ORDERS_URL)
+                        post(apiUrl)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody))
         //then
@@ -124,7 +130,7 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenOrderWithoutDeadlinedDate_whenPostOrder_thenShouldReturn4xxClientError() throws Exception {
+    void givenOrderWithoutDeadlinedDate_whenPost_thenShouldReturn4xxClientError() throws Exception {
         //given
         com.kelvin.smartwarehouse.model.Order order = buildOrder();
         order.setDeadlineDate(null);
@@ -133,7 +139,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        post(ORDERS_URL)
+                        post(apiUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonBody))
                 //then
@@ -145,7 +151,7 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenOrderWithDeadlinedDateInThePast_whenPostOrder_thenShouldReturn4xxClientError() throws Exception {
+    void givenOrderWithDeadlinedDateInThePast_whenPost_thenShouldReturn4xxClientError() throws Exception {
         //given
         com.kelvin.smartwarehouse.model.Order order = buildOrder();
         order.setDeadlineDate(LocalDate.now().minusDays(2));
@@ -154,7 +160,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        post(ORDERS_URL)
+                        post(apiUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonBody))
                 //then
@@ -166,8 +172,11 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    @Sql({"/order/orders_schema.sql", "/order/import_orders.sql"})
-    void givenSeedDataFromImportOrdersSqlAndId_whenGetById_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = importRecordsScript),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = deleteStatement)
+    })
+    void givenSeedDataFromImportSqlAndId_whenGetById_thenOkAndShouldReturnOrderWithGivenId() throws Exception {
 
         //given
         //the data imported from import_order_items.sql
@@ -175,7 +184,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        get(ORDERS_URL+ "/{id}", id)
+                        get(apiUrl+ "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
                 //then
                 .andExpect(status().isOk())
@@ -187,7 +196,7 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenEmptyOrdersListAndId_whenGetById_thenShouldReturn4xxClientError() throws Exception {
+    void givenEmptyListAndId_whenGetById_thenShouldReturn4xxClientError() throws Exception {
 
         //given
         //the data imported from import_order_items.sql
@@ -195,7 +204,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        get(ORDERS_URL + "/{id}", id)
+                        get(apiUrl + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isNoContent())
@@ -206,10 +215,10 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/order/orders_schema.sql", "/order/import_orders.sql"}),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = importRecordsScript),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = deleteStatement)
     })
-    void givenSeedDataFromImportOrdersSqlAndId_whenUpdate_thenOkStatusAndShouldUpdateOrder() throws Exception {
+    void givenSeedDataFromImportSqlAndId_whenUpdate_thenOkStatusAndShouldUpdateOrder() throws Exception {
 
         //given
         String id = "051191d4-4eba-48ca-9a8c-19076eb7f669";
@@ -222,7 +231,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        put(ORDERS_URL + "/{id}", id)
+                        put(apiUrl + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
                 //then
@@ -236,7 +245,7 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenEmptyOrdersListAndIdAndOrder_whenUpdate_thenOkStatusAndShouldCreateNewOrder() throws Exception {
+    void givenEmptyListAndIdAndOrder_whenUpdate_thenOkStatusAndShouldCreateNewOrder() throws Exception {
 
         //given
         String id = "051191d4-4eba-48ca-9a8c-19076eb7f669";
@@ -249,7 +258,7 @@ public class OrderApiTest {
 
         //when
         this.mockMvc.perform(
-                        put(ORDERS_URL + "/{id}", id)
+                        put(apiUrl + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
                 //then
@@ -264,23 +273,23 @@ public class OrderApiTest {
     @Test
     @Order(2)
     @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"/order/orders_schema.sql", "/order/import_orders.sql"}),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = "delete from orders")
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = importRecordsScript),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = deleteStatement)
     })
-    void givenSeedDataFromImportOrdersSqlAndId_whenDelete_thenNotFoundStatusAndShouldDeleteOrder() throws Exception {
+    void givenSeedDataFromImportSqlAndId_whenDelete_thenNotFoundStatusAndShouldDeleteOrder() throws Exception {
 
         //given
         String id = "051191d4-4eba-48ca-9a8c-19076eb7f669";
 
         //when
         this.mockMvc.perform(
-                        delete(ORDERS_URL + "/{id}", id)
+                        delete(apiUrl + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
         //then
                 .andExpect(status().isNoContent());
 
         this.mockMvc.perform(
-                        get(ORDERS_URL + "/{id}", id)
+                        get(apiUrl + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
@@ -290,20 +299,20 @@ public class OrderApiTest {
 
     @Test
     @Order(2)
-    void givenEmptyOrdersListAndId_whenDelete_thenNotFoundStatus() throws Exception {
+    void givenEmptyListAndId_whenDelete_thenNotFoundStatus() throws Exception {
 
         //given
         String id = "IdNotPresentInDb";
 
         //when
         this.mockMvc.perform(
-                        delete(ORDERS_URL + "/{id}", id)
+                        delete(apiUrl + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
                 //then
                 .andExpect(status().isNoContent());
 
         this.mockMvc.perform(
-                        get(ORDERS_URL + "/{id}", id)
+                        get(apiUrl + "/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))

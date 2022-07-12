@@ -14,8 +14,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.kelvin.smartwarehouse.api.InventoryItemApiTest.createSchemaScript;
 import static com.kelvin.smartwarehouse.management.AppConstants.INVENTORY_ITEMS_URL;
+import static com.kelvin.smartwarehouse.managment.TestConstants.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -25,15 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = createSchemaScript)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = INVENTORY_ITEMS_SCHEMA_SCRIPT)
 public class InventoryItemApiTest {
 
     private final ObjectMapper objectMapper;
     private final MockMvc mockMvc;
 
-    static final String createSchemaScript = "/inventory_item/inventory_items_schema.sql";
-    static final String importRecordsScript = "/inventory_item/import_inventory_items.sql";
-    static final String deleteStatement = "delete from inventory_items ";
+    static final String importRecordsScript = IMPORT_INVENTORY_ITEMS_SCRIPT;
+    static final String deleteStatement = DELETE_IMPORT_INVENTORY_STATEMENT;
     
     static final String apiUrl = INVENTORY_ITEMS_URL;
 
