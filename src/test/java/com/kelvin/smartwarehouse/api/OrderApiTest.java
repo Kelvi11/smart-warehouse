@@ -209,7 +209,7 @@ public class OrderApiTest {
         //then
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
-                .andExpect(jsonPath("$.message", is("Order with id [IdNotPresentInDb] doesn't exist in database!")));
+                .andExpect(jsonPath("$.message", is(String.format("Order with id [%s] doesn't exist in database!", id))));
     }
 
     @Test
@@ -293,7 +293,7 @@ public class OrderApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
-                .andExpect(jsonPath("$.message", is("Order with id [051191d4-4eba-48ca-9a8c-19076eb7f669] doesn't exist in database!")));
+                .andExpect(jsonPath("$.message", is(String.format("Order with id [%s] doesn't exist in database!", id))));
 
     }
 
@@ -316,7 +316,7 @@ public class OrderApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
-                .andExpect(jsonPath("$.message", is("Order with id [IdNotPresentInDb] doesn't exist in database!")));
+                .andExpect(jsonPath("$.message", is(String.format("Order with id [%s] doesn't exist in database!", id))));
 
     }
 }

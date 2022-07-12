@@ -235,7 +235,7 @@ public class InventoryItemApiTest {
         //then
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
-                .andExpect(jsonPath("$.message", is("Inventory item with id [IdNotPresentInDb] doesn't exist in database!")));
+                .andExpect(jsonPath("$.message", is(String.format("Inventory item with id [%s] doesn't exist in database!", id))));
     }
 
     @Test
@@ -323,7 +323,7 @@ public class InventoryItemApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
-                .andExpect(jsonPath("$.message", is("Inventory item with id [8af18e2f-95b5-4569-abde-ebc39746fc99] doesn't exist in database!")));
+                .andExpect(jsonPath("$.message", is(String.format("Inventory item with id [%s] doesn't exist in database!", id))));
 
     }
 
@@ -346,7 +346,7 @@ public class InventoryItemApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
-                .andExpect(jsonPath("$.message", is("Inventory item with id [IdNotPresentInDb] doesn't exist in database!")));
+                .andExpect(jsonPath("$.message", is(String.format("Inventory item with id [%s] doesn't exist in database!", id))));
 
     }
 }
