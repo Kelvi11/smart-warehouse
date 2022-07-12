@@ -23,13 +23,13 @@ public class InventoryItemApi extends BaseApi<InventoryItem> {
 
     @Override
     protected void prePersist(InventoryItem inventoryItem) throws Exception {
-        if (inventoryItem.getQuantity() < 0){
+        if (inventoryItem.getQuantity() < 1){
             throw new InvalidParameterException("Inventory item quantity should be a positive number!");
         }
-        if (inventoryItem.getUnitPrice() < 0){
+        if (inventoryItem.getUnitPrice() < 1){
             throw new InvalidParameterException("Inventory item price per unit should be a positive number!");
         }
-        if (inventoryItem.getPackageVolume() < 0){
+        if (inventoryItem.getPackageVolume() < 1){
             throw new InvalidParameterException("Inventory item volume per package should be a positive number!");
         }
     }
