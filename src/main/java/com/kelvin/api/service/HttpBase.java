@@ -30,6 +30,11 @@ public abstract class HttpBase {
         return Long.valueOf(value);
     }
 
+    public Double _double(String key) {
+        String value = ui.getParameter(key);
+        return Double.valueOf(value);
+    }
+
     public Boolean _boolean(String key) {
         String value = ui.getParameter(key);
         return Boolean.valueOf(value);

@@ -151,166 +151,6 @@ public class OrderItemApiTest {
 
     @Test
     @Order(2)
-    @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
-    })
-    void givenSeedDataFromImportSql_whenGetAllWithEqQuantityFilter_thenOkAndShouldReturnArrayFilteredByQuantityEquality() throws Exception {
-        //given
-        //we have the import-entity.sql script file loaded
-
-        //when
-        this.mockMvc.perform(
-                        get(apiUrl + "?eq.quantity=25")
-                                .contentType(MediaType.APPLICATION_JSON))
-                //then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(header().string("startRow", "0"))
-                .andExpect(header().string("pageSize", "10"))
-                .andExpect(header().string("listSize", "2"))
-                .andExpect(jsonPath("$.[0].uuid", is("a3e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
-                .andExpect(jsonPath("$.[0].itemUuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
-                .andExpect(jsonPath("$.[0].orderUuid", is("e8320e39-f185-4044-87df-8a7de39c0058")))
-                .andExpect(jsonPath("$.[0].quantity", is(25)));
-
-    }
-
-    @Test
-    @Order(2)
-    @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
-    })
-    void givenSeedDataFromImportSql_whenGetAllWithGtQuantityFilter_thenOkAndShouldReturnArrayFilteredByGtQuantity() throws Exception {
-        //given
-        //we have the import-entity.sql script file loaded
-
-        //when
-        this.mockMvc.perform(
-                        get(apiUrl + "?gt.quantity=99")
-                                .contentType(MediaType.APPLICATION_JSON))
-                //then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()", is(1)))
-                .andExpect(header().string("startRow", "0"))
-                .andExpect(header().string("pageSize", "10"))
-                .andExpect(header().string("listSize", "1"))
-                .andExpect(jsonPath("$.[0].uuid", is("a169f0ed-1364-45e6-9d3a-5cc5456e75f9")))
-                .andExpect(jsonPath("$.[0].itemUuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
-                .andExpect(jsonPath("$.[0].orderUuid", is("f72a8cde-412a-4a56-9974-b11d8f8da684")))
-                .andExpect(jsonPath("$.[0].quantity", is(100)));
-
-    }
-
-    @Test
-    @Order(2)
-    @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
-    })
-    void givenSeedDataFromImportSql_whenGetAllWithGeQuantityFilter_thenOkAndShouldReturnArrayFilteredByGeQuantity() throws Exception {
-        //given
-        //we have the import-entity.sql script file loaded
-
-        //when
-        this.mockMvc.perform(
-                        get(apiUrl + "?ge.quantity=99")
-                                .contentType(MediaType.APPLICATION_JSON))
-                //then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(header().string("startRow", "0"))
-                .andExpect(header().string("pageSize", "10"))
-                .andExpect(header().string("listSize", "2"))
-                .andExpect(jsonPath("$.[0].uuid", is("a169f0ed-1364-45e6-9d3a-5cc5456e75f9")))
-                .andExpect(jsonPath("$.[0].itemUuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
-                .andExpect(jsonPath("$.[0].orderUuid", is("f72a8cde-412a-4a56-9974-b11d8f8da684")))
-                .andExpect(jsonPath("$.[0].quantity", is(100)));
-
-    }
-
-    @Test
-    @Order(2)
-    @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
-    })
-    void givenSeedDataFromImportSql_whenGetAllWithLtQuantityFilter_thenOkAndShouldReturnArrayFilteredByLtQuantity() throws Exception {
-        //given
-        //we have the import-entity.sql script file loaded
-
-        //when
-        this.mockMvc.perform(
-                        get(apiUrl + "?lt.quantity=16")
-                                .contentType(MediaType.APPLICATION_JSON))
-                //then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()", is(1)))
-                .andExpect(header().string("startRow", "0"))
-                .andExpect(header().string("pageSize", "10"))
-                .andExpect(header().string("listSize", "1"))
-                .andExpect(jsonPath("$.[0].uuid", is("a2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
-                .andExpect(jsonPath("$.[0].itemUuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
-                .andExpect(jsonPath("$.[0].orderUuid", is("e8320e39-f185-4044-87df-8a7de39c0058")))
-                .andExpect(jsonPath("$.[0].quantity", is(15)));
-
-    }
-
-    @Test
-    @Order(2)
-    @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
-            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
-    })
-    void givenSeedDataFromImportSql_whenGetAllWithLeQuantityFilter_thenOkAndShouldReturnArrayFilteredByLeQuantity() throws Exception {
-        //given
-        //we have the import-entity.sql script file loaded
-
-        //when
-        this.mockMvc.perform(
-                        get(apiUrl + "?le.quantity=16")
-                                .contentType(MediaType.APPLICATION_JSON))
-                //then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(header().string("startRow", "0"))
-                .andExpect(header().string("pageSize", "10"))
-                .andExpect(header().string("listSize", "2"))
-                .andExpect(jsonPath("$.[0].uuid", is("a139f0ed-1364-45e6-9d3a-5cc5456e75f9")))
-                .andExpect(jsonPath("$.[0].itemUuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
-                .andExpect(jsonPath("$.[0].orderUuid", is("ff2a98fa-50b6-4d97-bb30-7d77aa731a01")))
-                .andExpect(jsonPath("$.[0].quantity", is(16)));
-
-    }
-
-    @Test
-    @Order(2)
     void givenEmptyTable_whenGetAll_thenOkAndShouldReturnEmptyArray() throws Exception {
         //given
         //we have the table empty
@@ -588,6 +428,167 @@ public class OrderItemApiTest {
                 .andExpect(status().isNoContent())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
                 .andExpect(jsonPath("$.message", is(String.format("Order item with id [%s] doesn't exist in database!", id))));
+
+    }
+
+    //filters
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithEqQuantityFilter_thenOkAndShouldReturnArrayFilteredByQuantityEquality() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?eq.quantity=25")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "2"))
+                .andExpect(jsonPath("$.[0].uuid", is("a3e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].itemUuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].orderUuid", is("e8320e39-f185-4044-87df-8a7de39c0058")))
+                .andExpect(jsonPath("$.[0].quantity", is(25)));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithGtQuantityFilter_thenOkAndShouldReturnArrayFilteredByGtQuantity() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?gt.quantity=99")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "1"))
+                .andExpect(jsonPath("$.[0].uuid", is("a169f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].itemUuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
+                .andExpect(jsonPath("$.[0].orderUuid", is("f72a8cde-412a-4a56-9974-b11d8f8da684")))
+                .andExpect(jsonPath("$.[0].quantity", is(100)));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithGeQuantityFilter_thenOkAndShouldReturnArrayFilteredByGeQuantity() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?ge.quantity=99")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "2"))
+                .andExpect(jsonPath("$.[0].uuid", is("a169f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].itemUuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
+                .andExpect(jsonPath("$.[0].orderUuid", is("f72a8cde-412a-4a56-9974-b11d8f8da684")))
+                .andExpect(jsonPath("$.[0].quantity", is(100)));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithLtQuantityFilter_thenOkAndShouldReturnArrayFilteredByLtQuantity() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?lt.quantity=16")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "1"))
+                .andExpect(jsonPath("$.[0].uuid", is("a2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].itemUuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].orderUuid", is("e8320e39-f185-4044-87df-8a7de39c0058")))
+                .andExpect(jsonPath("$.[0].quantity", is(15)));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithLeQuantityFilter_thenOkAndShouldReturnArrayFilteredByLeQuantity() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?le.quantity=16")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "2"))
+                .andExpect(jsonPath("$.[0].uuid", is("a139f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].itemUuid", is("051191d4-4eba-48ca-9a8c-19076eb7f669")))
+                .andExpect(jsonPath("$.[0].orderUuid", is("ff2a98fa-50b6-4d97-bb30-7d77aa731a01")))
+                .andExpect(jsonPath("$.[0].quantity", is(16)));
 
     }
 }

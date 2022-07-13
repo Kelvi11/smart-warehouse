@@ -6,6 +6,13 @@ import com.kelvin.smartwarehouse.model.InventoryItem;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.kelvin.smartwarehouse.management.AppConstants.INVENTORY_ITEMS_URL;
 
 @RestController
@@ -19,6 +26,24 @@ public class InventoryItemApi extends BaseApi<InventoryItem> {
     @Override
     protected String getDefaultOrderBy() {
         return "name asc";
+    }
+
+    @Override
+    protected List<Predicate> getFilters(CriteriaBuilder criteriaBuilder, Root<InventoryItem> root){
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (nn("like.name")) {
+            Path<String> orderUuid = root.get("name");
+            predicates.add(criteriaBuilder.like(orderUuid, likeParam("like.name")));
+        }
+
+        buildIntegerFieldFilters("quantity", criteriaBuilder, root, predicates);
+
+        buildDoubleFieldFilters("unitPrice", criteriaBuilder, root, predicates);
+
+        buildDoubleFieldFilters("packageVolume", criteriaBuilder, root, predicates);
+
+        return predicates;
     }
 
     @Override

@@ -18,7 +18,7 @@ import java.util.List;
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDER_BY_ASC;
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDER_BY_DESC;
 
-public abstract class BaseApi<T> extends HttpBase{
+public abstract class BaseApi<T> extends FilterBuilder<T>{
 
     protected final Class<T> entityClass;
 
