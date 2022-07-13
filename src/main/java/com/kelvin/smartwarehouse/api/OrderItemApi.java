@@ -39,9 +39,25 @@ public class OrderItemApi extends BaseApi<OrderItem> {
             Path<String> orderUuid = root.get("orderUuid");
             predicates.add(criteriaBuilder.equal(orderUuid, get("obj.orderUuid")));
         }
-        if (nn("obj.quantity")) {
+        if (nn("eq.quantity")) {
             Path<Integer> quantity = root.get("quantity");
-            predicates.add(criteriaBuilder.equal(quantity, _integer("obj.quantity")));
+            predicates.add(criteriaBuilder.equal(quantity, _integer("eq.quantity")));
+        }
+        if (nn("gt.quantity")) {
+            Path<Integer> quantity = root.get("quantity");
+            predicates.add(criteriaBuilder.gt(quantity, _integer("gt.quantity")));
+        }
+        if (nn("ge.quantity")) {
+            Path<Integer> quantity = root.get("quantity");
+            predicates.add(criteriaBuilder.ge(quantity, _integer("ge.quantity")));
+        }
+        if (nn("lt.quantity")) {
+            Path<Integer> quantity = root.get("quantity");
+            predicates.add(criteriaBuilder.lt(quantity, _integer("lt.quantity")));
+        }
+        if (nn("le.quantity")) {
+            Path<Integer> quantity = root.get("quantity");
+            predicates.add(criteriaBuilder.le(quantity, _integer("le.quantity")));
         }
 
         return predicates;
