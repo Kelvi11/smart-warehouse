@@ -10,14 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDER_BY_ASC;
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDER_BY_DESC;
@@ -49,8 +45,6 @@ public abstract class BaseApi<T> extends HttpBase{
             @RequestParam(value = "orderBy", required = false) String orderBy
     ) throws Exception {
 
-        applyFilters();
-
         long listSize = count();
         List<T> list;
         if (listSize == 0) {
@@ -77,26 +71,37 @@ public abstract class BaseApi<T> extends HttpBase{
 
     private long count(){
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> countCriteriaQuery = criteriaBuilder.createQuery(Long.class);
-        countCriteriaQuery.select(criteriaBuilder.count(countCriteriaQuery.from(getEntityClass())));
 
-        return entityManager.createQuery(countCriteriaQuery).getSingleResult();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+
+        Root<T> root = criteriaQuery.from(getEntityClass());
+        criteriaQuery.select(criteriaBuilder.count(root));
+
+        List<Predicate> predicates = getFilters(criteriaBuilder, root);
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
+
+        return entityManager.createQuery(criteriaQuery).getSingleResult();
     }
 
-    private TypedQuery<T> getSearch(String orderBy){
+    protected TypedQuery<T> getSearch(String orderBy) throws Exception {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
         CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(getEntityClass());
+
         Root<T> root = criteriaQuery.from(getEntityClass());
         criteriaQuery.select(root);
+
+        List<Predicate> predicates = getFilters(criteriaBuilder, root);
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
 
         List<Order> orderList = sort(orderBy, criteriaBuilder, root);
         criteriaQuery.orderBy(orderList);
 
-        TypedQuery<T> search = entityManager.createQuery(criteriaQuery);
+        TypedQuery<T> search = getEntityManager().createQuery(criteriaQuery);
         return search;
     }
 
-    private List<Order> sort(String orderBy, CriteriaBuilder criteriaBuilder, Root<T> routeRoot) {
+    protected List<Order> sort(String orderBy, CriteriaBuilder criteriaBuilder, Root<T> routeRoot) {
         List<Order> orderList = new ArrayList<>();
 
         List<String> orderByExpresions;
@@ -120,8 +125,8 @@ public abstract class BaseApi<T> extends HttpBase{
         return orderList;
     }
 
-    public void applyFilters() throws Exception {
-
+    protected List<Predicate> getFilters(CriteriaBuilder criteriaBuilder, Root<T> root) {
+        return Collections.EMPTY_LIST;
     }
     protected abstract String getDefaultOrderBy();
 

@@ -1,7 +1,7 @@
 INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a2e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'e8320e39-f185-4044-87df-8a7de39c0058', 15);
-INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a3e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9', '3397de7b-a27b-444f-baac-58d90d2a94fe', 25);
-INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a4e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'cfe8d42f-f5ee-413a-b088-5aa232fe9423', 35);
-INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a5e9f0ed-1364-45e6-9d3a-5cc5456e75f9', '9fe2e517-c135-4f3e-a1c2-705e5b59a4f7', '0a57401e-7ce3-4c7f-b049-c5c52d21a572', 17);
+INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a3e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'e8320e39-f185-4044-87df-8a7de39c0058', 25);
+INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a4e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9', 'e8320e39-f185-4044-87df-8a7de39c0058', 35);
+INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a5e9f0ed-1364-45e6-9d3a-5cc5456e75f9', '9fe2e517-c135-4f3e-a1c2-705e5b59a4f7', '0a57401e-7ce3-4c7f-b049-c5c52d21a572', 25);
 INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a6e9f0ed-1364-45e6-9d3a-5cc5456e75f9', '9fe2e517-c135-4f3e-a1c2-705e5b59a4f7', '8f9093a0-5023-45fd-b594-0dc6379fe4f9', 49);
 INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a7e9f0ed-1364-45e6-9d3a-5cc5456e75f9', '051191d4-4eba-48ca-9a8c-19076eb7f669', 'c455da23-fe31-43a5-b7fe-5420d1df4fa0', 18);
 INSERT INTO order_items(uuid, item_uuid, order_uuid, quantity) VALUES('a8e9f0ed-1364-45e6-9d3a-5cc5456e75f9', '051191d4-4eba-48ca-9a8c-19076eb7f669', '90b60fd8-2763-4095-aee7-80d326f6a790', 50);

@@ -2,15 +2,17 @@ package com.kelvin.smartwarehouse.api;
 
 import com.kelvin.api.service.BaseApi;
 import com.kelvin.smartwarehouse.exception.InvalidParameterException;
-import com.kelvin.smartwarehouse.model.Order;
 import com.kelvin.smartwarehouse.model.OrderItem;
-import org.hibernate.Session;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.kelvin.smartwarehouse.management.AppConstants.ORDERS_URL;
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDER_ITEMS_URL;
 
 @RestController
@@ -26,13 +28,23 @@ public class OrderItemApi extends BaseApi<OrderItem> {
         return "quantity desc";
     }
 
-    @Override
-    public void applyFilters() throws Exception {
-        if (nn("like.created_by")) {
-            getEntityManager().unwrap(Session.class)
-                    .enableFilter("like.created_by")
-                    .setParameter("created_by", likeParamToLowerCase("like.created_by"));
+    protected List<Predicate> getFilters(CriteriaBuilder criteriaBuilder, Root<OrderItem> root){
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (nn("obj.itemUuid")) {
+            Path<String> orderUuid = root.get("itemUuid");
+            predicates.add(criteriaBuilder.equal(orderUuid, get("obj.itemUuid")));
         }
+        if (nn("obj.orderUuid")) {
+            Path<String> orderUuid = root.get("orderUuid");
+            predicates.add(criteriaBuilder.equal(orderUuid, get("obj.orderUuid")));
+        }
+        if (nn("obj.quantity")) {
+            Path<Integer> quantity = root.get("quantity");
+            predicates.add(criteriaBuilder.equal(quantity, _integer("obj.quantity")));
+        }
+
+        return predicates;
     }
 
     @Override

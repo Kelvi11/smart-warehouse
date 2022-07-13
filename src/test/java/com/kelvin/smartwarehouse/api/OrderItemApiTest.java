@@ -83,6 +83,38 @@ public class OrderItemApiTest {
 
     @Test
     @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_INVENTORY_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDER_ITEMS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_IMPORT_INVENTORY_STATEMENT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDER_ITEMS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithFilter_thenOkAndShouldReturnArrayFiltered() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?obj.orderUuid=e8320e39-f185-4044-87df-8a7de39c0058")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(3)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "3"))
+                .andExpect(jsonPath("$.[0].uuid", is("a4e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].itemUuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].orderUuid", is("e8320e39-f185-4044-87df-8a7de39c0058")))
+                .andExpect(jsonPath("$.[0].quantity", is(35)));
+
+    }
+
+    @Test
+    @Order(2)
     void givenEmptyTable_whenGetAll_thenOkAndShouldReturnEmptyArray() throws Exception {
         //given
         //we have the table empty
