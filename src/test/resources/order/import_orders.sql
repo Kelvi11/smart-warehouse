@@ -1,5 +1,5 @@
 INSERT INTO orders(uuid, submitted_date, deadline_date, status) VALUES('b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9', '2022-07-01', '2022-07-10', 'CREATED');
-INSERT INTO orders(uuid, submitted_date, deadline_date, status) VALUES('9fe2e517-c135-4f3e-a1c2-705e5b59a4f7', '2022-06-015', '2022-06-30', 'FULFILLED');
+INSERT INTO orders(uuid, submitted_date, deadline_date, status) VALUES('9fe2e517-c135-4f3e-a1c2-705e5b59a4f7', '2022-06-15', '2022-06-30', 'FULFILLED');
 INSERT INTO orders(uuid, submitted_date, deadline_date, status) VALUES('051191d4-4eba-48ca-9a8c-19076eb7f669', '2022-05-01', '2022-05-15', 'CANCELED');
 INSERT INTO orders(uuid, submitted_date, deadline_date, status) VALUES('2fce2c6b-e500-44ed-b216-0ecb1b4f5823', '2022-05-01', '2022-05-15', 'CANCELED');
 INSERT INTO orders(uuid, submitted_date, deadline_date, status) VALUES('34c4ac1f-508c-4fde-bc29-fa7b5b0c2a56', '2022-05-01', '2022-05-15', 'CANCELED');

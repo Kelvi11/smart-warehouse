@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -319,4 +320,202 @@ public class OrderApiTest {
                 .andExpect(jsonPath("$.message", is(String.format("Order with id [%s] doesn't exist in database!", id))));
 
     }
+
+    //filters
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithFromSubmittedDateFilter_thenOkAndShouldReturnArrayFilteredByFromSubmittedDate() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?from.submittedDate=2022-06-30")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "1"))
+                .andExpect(jsonPath("$.[0].uuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-07-01")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-07-10")))
+                .andExpect(jsonPath("$.[0].status", is(OrderStatus.CREATED.name())));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithToSubmittedDateFilter_thenOkAndShouldReturnArrayFilteredByToSubmittedDate() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?to.submittedDate=2022-06-15")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "23"))
+                .andExpect(jsonPath("$.[0].uuid", is("6485c3ea-ed19-49da-bbbf-b5eb6eae4180")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-05-01")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-05-15")))
+                .andExpect(jsonPath("$.[0].status", is(OrderStatus.CANCELED.name())));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithEqualSubmittedDateFilter_thenOkAndShouldReturnArrayFilteredByEqualSubmittedDate() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?eq.submittedDate=2022-06-15")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "1"))
+                .andExpect(jsonPath("$.[0].uuid", is("9fe2e517-c135-4f3e-a1c2-705e5b59a4f7")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-06-15")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-06-30")))
+                .andExpect(jsonPath("$.[0].status", is(OrderStatus.FULFILLED.name())));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithObjStatusFilter_thenOkAndShouldReturnArrayFilteredByStatus() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?obj.status=CANCELED")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "23"))
+                .andExpect(jsonPath("$.[0].uuid", is("6485c3ea-ed19-49da-bbbf-b5eb6eae4180")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-05-01")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-05-15")))
+                .andExpect(jsonPath("$.[0].status", is(OrderStatus.CANCELED.name())));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithFromDeadlineDateFilter_thenOkAndShouldReturnArrayFilteredByFromDeadlineDate() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?from.deadlineDate=2022-06-30")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "1"))
+                .andExpect(jsonPath("$.[0].uuid", is("b2e9f0ed-1364-45e6-9d3a-5cc5456e75f9")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-07-01")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-07-10")))
+                .andExpect(jsonPath("$.[0].status", is(OrderStatus.CREATED.name())));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithToDeadlineDateFilter_thenOkAndShouldReturnArrayFilteredByToSubmittedDate() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?to.deadlineDate=2022-06-30")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "23"))
+                .andExpect(jsonPath("$.[0].uuid", is("6485c3ea-ed19-49da-bbbf-b5eb6eae4180")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-05-01")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-05-15")))
+                .andExpect(jsonPath("$.[0].status", is(OrderStatus.CANCELED.name())));
+
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = IMPORT_ORDERS_SCRIPT),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = DELETE_ORDERS_STATEMENT)
+    })
+    void givenSeedDataFromImportSql_whenGetAllWithEqualDeadlineDateFilter_thenOkAndShouldReturnArrayFilteredByEqualDeadlineDate() throws Exception {
+        //given
+        //we have the import-entity.sql script file loaded
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "?eq.deadlineDate=2022-06-30")
+                                .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(header().string("startRow", "0"))
+                .andExpect(header().string("pageSize", "10"))
+                .andExpect(header().string("listSize", "1"))
+                .andExpect(jsonPath("$.[0].uuid", is("9fe2e517-c135-4f3e-a1c2-705e5b59a4f7")))
+                .andExpect(jsonPath("$.[0].submittedDate", is("2022-06-15")))
+                .andExpect(jsonPath("$.[0].deadlineDate", is("2022-06-30")))
+                .andExpect(jsonPath("$.[0].status", is(OrderStatus.FULFILLED.name())));
+
+    }
+
 }

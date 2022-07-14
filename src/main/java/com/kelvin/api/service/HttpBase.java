@@ -3,6 +3,7 @@ package com.kelvin.api.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,7 +41,12 @@ public abstract class HttpBase {
         return Boolean.valueOf(value);
     }
 
-    protected final String likeParamToLowerCase(String value) {
+    public LocalDate _localDate(String key) {
+        String value = ui.getParameter(key);
+        return LocalDate.parse(value);
+    }
+
+        protected final String likeParamToLowerCase(String value) {
         return "%" + get(value).toLowerCase() + "%";
     }
 

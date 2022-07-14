@@ -44,4 +44,17 @@ public abstract class FilterBuilder<T> extends HttpBase{
             predicates.add(criteriaBuilder.le(root.get(name), _double("le." + name)));
         }
     }
+
+    public void buildLocalDateFieldFilters(String name, CriteriaBuilder criteriaBuilder, Root<T> root, List<Predicate> predicates){
+
+        if (nn("from." + name)) {
+            predicates.add(criteriaBuilder.greaterThan(root.get(name), _localDate("from." + name)));
+        }
+        if (nn("to." + name)) {
+            predicates.add(criteriaBuilder.lessThan(root.get(name), _localDate("to." + name)));
+        }
+        if (nn("eq." + name)) {
+            predicates.add(criteriaBuilder.equal(root.get(name), _localDate("eq." + name)));
+        }
+    }
 }

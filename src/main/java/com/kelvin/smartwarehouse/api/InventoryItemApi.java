@@ -33,8 +33,7 @@ public class InventoryItemApi extends BaseApi<InventoryItem> {
         List<Predicate> predicates = new ArrayList<>();
 
         if (nn("like.name")) {
-            Path<String> orderUuid = root.get("name");
-            predicates.add(criteriaBuilder.like(orderUuid, likeParam("like.name")));
+            predicates.add(criteriaBuilder.like(root.get("name"), likeParam("like.name")));
         }
 
         buildIntegerFieldFilters("quantity", criteriaBuilder, root, predicates);
