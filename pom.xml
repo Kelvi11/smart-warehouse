@@ -15,6 +15,7 @@
 	<description>Warehouse management application</description>
 	<properties>
 		<java.version>11</java.version>
+		<openApi.version>1.6.4</openApi.version>
 	</properties>
 	<dependencies>
 
@@ -40,6 +41,18 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+
+		<!--Open API-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${openApi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${openApi.version}</version>
 		</dependency>
 
 		<!--Testing-->
