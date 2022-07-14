@@ -3,7 +3,6 @@ package com.kelvin.smartwarehouse.api;
 import com.kelvin.api.service.BaseApi;
 import com.kelvin.smartwarehouse.exception.InvalidParameterException;
 import com.kelvin.smartwarehouse.model.Order;
-import com.kelvin.smartwarehouse.model.OrderItem;
 import com.kelvin.smartwarehouse.model.enums.OrderStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
