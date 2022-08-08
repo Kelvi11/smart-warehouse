@@ -14,16 +14,17 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.File;
 import java.time.LocalDate;
 
 import static com.kelvin.smartwarehouse.management.AppConstants.ORDERS_URL;
 import static com.kelvin.smartwarehouse.managment.TestConstants.*;
+import static com.kelvin.smartwarehouse.utils.CsvUtils.extractCsvFileContentAsString;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -51,6 +52,7 @@ public class OrderApiTest {
         assertThat(mockMvc).isNotNull();
     }
 
+    //crud
     @Test
     @Order(2)
     @SqlGroup({
@@ -319,6 +321,53 @@ public class OrderApiTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityWithIdNotFoundException))
                 .andExpect(jsonPath("$.message", is(String.format("Order with id [%s] doesn't exist in database!", id))));
 
+    }
+
+    //export
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = importRecordsScript),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = deleteStatement)
+    })
+    void givenSeedDataFromImportSql_whenExportOrdersToCsv_thenOkAndShouldReturnThCsvFileWithRecords() throws Exception {
+
+        //given
+        File file = new File(ORDERS_CSV_PATH);
+
+        String content = extractCsvFileContentAsString(file);
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "/export")
+                                .contentType(MediaType.APPLICATION_OCTET_STREAM))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .andExpect(content().string(content));
+    }
+
+    @Test
+    @Order(2)
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = importRecordsScript),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = deleteStatement)
+    })
+    void givenSeedDataFromImportSql_whenExportOrdersToXlsx_thenOkAndShouldReturnThCsvFileWithRecords() throws Exception {
+
+        //given
+        File file = new File("src/test/resources/order/orders.csv");
+
+        String content = extractCsvFileContentAsString(file);
+
+        //when
+        this.mockMvc.perform(
+                        get(apiUrl + "/export")
+                                .contentType(MediaType.APPLICATION_OCTET_STREAM))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .andExpect(content().string(content));
     }
 
     //filters

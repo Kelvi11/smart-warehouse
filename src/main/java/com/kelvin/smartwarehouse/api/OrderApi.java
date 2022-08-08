@@ -4,13 +4,21 @@ import com.kelvin.api.service.BaseApi;
 import com.kelvin.smartwarehouse.exception.InvalidParameterException;
 import com.kelvin.smartwarehouse.model.Order;
 import com.kelvin.smartwarehouse.model.enums.OrderStatus;
+import com.kelvin.smartwarehouse.utils.CsvUtils;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,4 +63,40 @@ public class OrderApi extends BaseApi<Order> {
             throw new InvalidParameterException("Order deadline date should be in the future!");
         }
     }
+
+    @GetMapping(value = "/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Transactional
+    public ResponseEntity exportOrdersToCsv(@RequestParam(defaultValue = "csv") String type) throws Exception {
+
+        File file;
+        if (type.equals("csv")) {
+            file = Files.createTempFile("orders", ".csv").toFile();
+        }
+        else {
+            String message = String.format("%s type is not supported for the orders export.", type);
+            throw new InvalidParameterException(message);
+        }
+        List<Order> list = getAll();
+        CsvUtils.writeCsv(new FileWriter(file), list);
+
+        FileInputStream fileInputStream = new FileInputStream(file);
+
+        byte[] content = fileInputStream.readAllBytes();
+
+        return ResponseEntity.ok(content);
+    }
+
+    private List<Order> getAll() {
+        CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
+
+        CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(getEntityClass());
+
+        Root<Order> root = criteriaQuery.from(getEntityClass());
+        criteriaQuery.select(root);
+
+        TypedQuery<Order> search = getEntityManager().createQuery(criteriaQuery);
+
+        return search.getResultList();
+    }
 }
+

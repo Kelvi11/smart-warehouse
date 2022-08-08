@@ -69,7 +69,7 @@ public abstract class BaseApi<T> extends FilterBuilder<T>{
                 .body(list);
     }
 
-    private long count(){
+    protected long count(){
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -154,7 +154,7 @@ public abstract class BaseApi<T> extends FilterBuilder<T>{
         return ResponseEntity.ok(t);
     }
 
-    private T getTByIdOrThrowException(String id) {
+    protected T getTByIdOrThrowException(String id) {
         T t = entityManager.find(getEntityClass(), id);
 
         if (t == null){

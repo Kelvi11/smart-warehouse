@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<openApi.version>1.6.4</openApi.version>
+		<openCsv.version>4.1</openCsv.version>
 	</properties>
 	<dependencies>
 
@@ -41,6 +42,13 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+
+		<!--CSV-->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>${openCsv.version}</version>
 		</dependency>
 
 		<!--Open API-->

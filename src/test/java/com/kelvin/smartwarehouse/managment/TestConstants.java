@@ -6,6 +6,7 @@ public class TestConstants {
     public final static String ORDERS_SCHEMA_SCRIPT = ORDERS_SCRIPTS + "/orders_schema.sql";
     public final static String IMPORT_ORDERS_SCRIPT = ORDERS_SCRIPTS + "/import_orders.sql";
     public final static String DELETE_ORDERS_STATEMENT = "delete from orders;";
+    public final static String ORDERS_CSV_PATH = "src/test/resources/order/orders.csv";
 
     public final static String INVENTORY_ITEMS_SCRIPTS = "/inventory_item";
     public final static String INVENTORY_ITEMS_SCHEMA_SCRIPT = INVENTORY_ITEMS_SCRIPTS + "/inventory_items_schema.sql";
