@@ -5,6 +5,7 @@ import com.kelvin.smartwarehouse.exception.InvalidParameterException;
 import com.kelvin.smartwarehouse.model.Order;
 import com.kelvin.smartwarehouse.model.enums.OrderStatus;
 import com.kelvin.smartwarehouse.utils.CsvUtils;
+import com.kelvin.smartwarehouse.utils.XlsxUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,18 +67,22 @@ public class OrderApi extends BaseApi<Order> {
 
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Transactional
-    public ResponseEntity exportOrdersToCsv(@RequestParam(defaultValue = "csv") String type) throws Exception {
+    public ResponseEntity exportOrders(@RequestParam(defaultValue = "csv") String type) throws Exception {
 
         File file;
+        List<Order> list = getAll();
         if (type.equals("csv")) {
             file = Files.createTempFile("orders", ".csv").toFile();
+            CsvUtils.writeCsv(new FileWriter(file), list);
+        }
+        else if(type.equals("xlsx")){
+            file = Files.createTempFile("orders", ".xlsx").toFile();
+            XlsxUtils.writeXlsx(file, list);
         }
         else {
             String message = String.format("%s type is not supported for the orders export.", type);
             throw new InvalidParameterException(message);
         }
-        List<Order> list = getAll();
-        CsvUtils.writeCsv(new FileWriter(file), list);
 
         FileInputStream fileInputStream = new FileInputStream(file);
 

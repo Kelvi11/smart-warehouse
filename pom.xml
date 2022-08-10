@@ -17,6 +17,7 @@
 		<java.version>11</java.version>
 		<openApi.version>1.6.4</openApi.version>
 		<openCsv.version>4.1</openCsv.version>
+		<apachePoi.version>5.2.2</apachePoi.version>
 	</properties>
 	<dependencies>
 
@@ -49,6 +50,18 @@
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 			<version>${openCsv.version}</version>
+		</dependency>
+
+		<!--Xlsx-->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${apachePoi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${apachePoi.version}</version>
 		</dependency>
 
 		<!--Open API-->
